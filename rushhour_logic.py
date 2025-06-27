@@ -107,3 +107,37 @@ class RushHourSolver:
                 counter += 1
                 heapq.heappush(heap, (cost+move_cost, counter, next_state, path + [(state, action, move_cost)]))
         return None, None 
+    
+    # [HHLoc] BFSs solution
+    def solve_bfs(self):                    # Output: path + the last state, cost
+        queue = [(self.initial_state, [])]  # A list that stores tuples: (current_state, path)
+        visited = set()                     # A set that stores explored states
+
+        while queue:
+            state, path = queue.pop(0)      # Take the fist state and path from queue
+            if state in visited:            # Continue if the current state is visited
+                continue
+            visited.add(state)              # Add the current state to visited
+            if state.is_goal():             # Return if the current state is goal
+                return path + [(state, None, 0)], len(path)
+                                            # Add the current state's successors to queue
+            for next_state, action, _ in state.successors():
+                queue.append((next_state, path + [(state, action, 1)])) 
+        return None, None                   # Return if no goal is found
+    
+    # [HHLoc] DFSs solution
+    def solve_dfs(self):                    # Output: path + the last state, cost
+        stack = [(self.initial_state, [])]  # A stack that stores tuples: (current_state, path)
+        visited = set()                     # A set that stores explored states
+        while stack:
+            state, path = stack.pop()       # Take the last state and path from stack
+            if state in visited:            # Continue if the current state is visited
+                continue
+            visited.add(state)              # Add the current state to visited
+            if state.is_goal():             # Return if the current state is goal
+                return path + [(state, None, 0)], len(path)
+                                            # Add the current state's successors to stack
+            for next_state, action, _ in reversed(state.successors()):
+                stack.append((next_state, path + [(state, action, 1)]))
+        return None, None                   # Return if no goal is found
+    
