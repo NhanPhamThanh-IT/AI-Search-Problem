@@ -141,3 +141,42 @@ class RushHourSolver:
                 stack.append((next_state, path + [(state, action, 1)]))
         return None, None                   # Return if no goal is found
     
+    def heuristic(self, state):
+        # Heuristic: count the number of blocking vehicles in front of 'X' to the exit
+        if 'X' not in state.vehicles:
+            return 0
+        vehicle = state.vehicles['X']
+        if vehicle.orientation != 'H':
+            return 0  # Only handle horizontal 'X'
+        row = vehicle.positions[0][0]
+        max_j = max(j for i, j in vehicle.positions)
+        count = 0
+        for j in range(max_j + 1, len(state.board[0])):
+            cell = state.board[row][j]
+            if cell != '.' and cell != ' ':
+                count += 1
+        return count
+
+    def solve_AStar(self):
+        heap = []
+        counter = 0
+        start_h = self.heuristic(self.initial_state)
+        heapq.heappush(heap, (start_h, 0, counter, self.initial_state, []))  # (f, g, counter, state, path)
+        visited = set()
+        while heap:
+            f, g, _, state, path = heapq.heappop(heap)
+            if state in visited:
+                continue
+            visited.add(state)
+            if state.is_goal():
+                return path + [(state, None, 0)], g
+            for next_state, action, move_cost in state.successors():
+                if next_state in visited:
+                    continue
+                counter += 1
+                new_g = g + move_cost
+                h = self.heuristic(next_state)
+                heapq.heappush(heap, (new_g + h, new_g, counter, next_state, path + [(state, action, move_cost)]))
+        return None, None
+
+
