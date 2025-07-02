@@ -96,58 +96,64 @@ class RushHourSolver:
         counter = 0
         heapq.heappush(heap, (0, counter, self.initial_state, []))
         visited = set()
+        expanded_nodes = []
+        
         while heap:
             cost, _, state, path = heapq.heappop(heap)
             if state in visited:
                 continue
             visited.add(state)
+            expanded_nodes.append((state, cost))
+            
             if state.is_goal():
-                return path + [(state, None, 0)], cost
+                return path + [(state, None, 0)], cost, expanded_nodes
             for next_state, action, move_cost in state.successors():
                 counter += 1
                 heapq.heappush(heap, (cost+move_cost, counter, next_state, path + [(state, action, move_cost)]))
-        return None, None 
+        return None, None, expanded_nodes 
     
-    # [HHLoc] BFSs solution
-    def solve_bfs(self):                    # Output: path + the last state, cost
-        queue = [(self.initial_state, [])]  # A list that stores tuples: (current_state, path)
-        visited = set()                     # A set that stores explored states
+    def solve_bfs(self):
+        queue = [(self.initial_state, [])]
+        visited = set()
+        expanded_nodes = []
 
         while queue:
-            state, path = queue.pop(0)      # Take the fist state and path from queue
-            if state in visited:            # Continue if the current state is visited
+            state, path = queue.pop(0)
+            if state in visited:
                 continue
-            visited.add(state)              # Add the current state to visited
-            if state.is_goal():             # Return if the current state is goal
-                return path + [(state, None, 0)], len(path)
-                                            # Add the current state's successors to queue
+            visited.add(state)
+            expanded_nodes.append((state, len(path)))
+            
+            if state.is_goal():
+                return path + [(state, None, 0)], len(path), expanded_nodes
             for next_state, action, _ in state.successors():
                 queue.append((next_state, path + [(state, action, 1)])) 
-        return None, None                   # Return if no goal is found
+        return None, None, expanded_nodes
     
-    # [HHLoc] DFSs solution
-    def solve_dfs(self):                    # Output: path + the last state, cost
-        stack = [(self.initial_state, [])]  # A stack that stores tuples: (current_state, path)
-        visited = set()                     # A set that stores explored states
+    def solve_dfs(self):
+        stack = [(self.initial_state, [])]
+        visited = set()
+        expanded_nodes = []
+        
         while stack:
-            state, path = stack.pop()       # Take the last state and path from stack
-            if state in visited:            # Continue if the current state is visited
+            state, path = stack.pop()
+            if state in visited:
                 continue
-            visited.add(state)              # Add the current state to visited
-            if state.is_goal():             # Return if the current state is goal
-                return path + [(state, None, 0)], len(path)
-                                            # Add the current state's successors to stack
+            visited.add(state)
+            expanded_nodes.append((state, len(path)))
+            
+            if state.is_goal():
+                return path + [(state, None, 0)], len(path), expanded_nodes
             for next_state, action, _ in reversed(state.successors()):
                 stack.append((next_state, path + [(state, action, 1)]))
-        return None, None                   # Return if no goal is found
+        return None, None, expanded_nodes
     
     def heuristic(self, state):
-        # Heuristic: count the number of blocking vehicles in front of 'X' to the exit
         if 'X' not in state.vehicles:
             return 0
         vehicle = state.vehicles['X']
         if vehicle.orientation != 'H':
-            return 0  # Only handle horizontal 'X'
+            return 0
         row = vehicle.positions[0][0]
         max_j = max(j for i, j in vehicle.positions)
         count = 0
@@ -161,15 +167,19 @@ class RushHourSolver:
         heap = []
         counter = 0
         start_h = self.heuristic(self.initial_state)
-        heapq.heappush(heap, (start_h, 0, counter, self.initial_state, []))  # (f, g, counter, state, path)
+        heapq.heappush(heap, (start_h, 0, counter, self.initial_state, []))
         visited = set()
+        expanded_nodes = []
+        
         while heap:
             f, g, _, state, path = heapq.heappop(heap)
             if state in visited:
                 continue
             visited.add(state)
+            expanded_nodes.append((state, g, f))
+            
             if state.is_goal():
-                return path + [(state, None, 0)], g
+                return path + [(state, None, 0)], g, expanded_nodes
             for next_state, action, move_cost in state.successors():
                 if next_state in visited:
                     continue
@@ -177,6 +187,6 @@ class RushHourSolver:
                 new_g = g + move_cost
                 h = self.heuristic(next_state)
                 heapq.heappush(heap, (new_g + h, new_g, counter, next_state, path + [(state, action, move_cost)]))
-        return None, None
+        return None, None, expanded_nodes
 
 
