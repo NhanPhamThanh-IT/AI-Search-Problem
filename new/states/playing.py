@@ -24,6 +24,10 @@ def run_playing(screen, clock, play_data):
             x = padding + i * gap - text_rect.width // 2
             screen.blit(text_surface, (x, y))
 
+        # ---------- Render the title at the top center ----------
+        map_path = 'maps/' + f"{play_data.get('level', 'default')}/{play_data.get('map', 'default')}.json"
+        
+
         # ---------- Render bottom centered hint ----------
         hint = FONT.render("Press ESC to return to Menu", True, (255, 255, 255))
         hint_rect = hint.get_rect(center=(screen_width // 2, screen_height - 40))
