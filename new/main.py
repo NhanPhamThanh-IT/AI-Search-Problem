@@ -1,6 +1,6 @@
 import pygame
-from .config import SETTINGS
-from .states import run_menu, run_playing
+from config import SETTINGS
+from scenes import run_menu, run_playing
 
 def run_game():
     pygame.init()
@@ -21,3 +21,6 @@ def run_game():
             running = False
 
     pygame.quit()
+
+if __name__ == "__main__":
+    run_game()

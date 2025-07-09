@@ -1,7 +1,7 @@
 import pygame
-from ..config import SETTINGS
-from ..entities import Button
-from ..utils import random_map
+from config import SETTINGS
+from entities import Button
+from utils import random_map
 
 
 def run_menu(screen, clock):
@@ -9,7 +9,7 @@ def run_menu(screen, clock):
     font = pygame.font.Font(None, 36)
     title_font = pygame.font.Font(None, 42)
 
-    selected = {"level": None, "map": None, "algorithm": None}
+    selected = {"map": None, "algorithm": None}
     buttons = []
 
     def select_item(category, value):
@@ -20,12 +20,11 @@ def run_menu(screen, clock):
 
     section_spacing = SETTINGS["WINDOW_SIZE"][1] // 5
     section_y_positions = {
-        "level": section_spacing * 0.8,
         "map": section_spacing * 2,
         "algorithm": section_spacing * 3.2,
     }
 
-    for category, values in [("level", SETTINGS["LEVELS"]), ("map", SETTINGS["MAPS"]), ("algorithm", SETTINGS["ALGORITHMS"])]:
+    for category, values in [("map", SETTINGS["MAPS"]), ("algorithm", SETTINGS["ALGORITHMS"])]:
         y_button = section_y_positions[category]
         x_start = SETTINGS["WINDOW_SIZE"][0] // 2 - (len(values) * 110 - 10) // 2
         for i, val in enumerate(values):
@@ -40,7 +39,7 @@ def run_menu(screen, clock):
         mouse_pos = pygame.mouse.get_pos()
         screen.fill(SETTINGS["BG_COLOR"])
 
-        for category in ["level", "map", "algorithm"]:
+        for category in ["map", "algorithm"]:
             y_label = section_y_positions[category] - 40
             label = title_font.render(f"Select {category.title()}", True, (255, 255, 255))
             screen.blit(label, label.get_rect(center=(SETTINGS["WINDOW_SIZE"][0] // 2, y_label)))
@@ -59,10 +58,9 @@ def run_menu(screen, clock):
                 play_button.hover = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     return SETTINGS["SCENES"]["PLAY"], {
-                            "level": selected["level"],
-                            "map": random_map() if selected["map"] == "Random" else selected["map"],
-                            "algorithm": selected["algorithm"]
-                        }
+                        "map": random_map() if selected["map"] == "Random" else selected["map"],
+                        "algorithm": selected["algorithm"]
+                    }
             else:
                 play_button.hover = False
 

@@ -1,7 +1,7 @@
 import numpy as np
 import json
 import random
-from ..config import SETTINGS
+from config import SETTINGS
 
 def random_map():
     return random.choice(SETTINGS["MAPS"][:-1]) if SETTINGS["MAPS"] else None
