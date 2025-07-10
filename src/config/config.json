@@ -12,7 +12,7 @@
   "MAPS": ["1", "2", "3", "4", "5", "Random"],
   "ALGORITHMS": ["BFS", "DFS", "UCS", "A*"],
 
-  "CELL_SIZE": 80,
+  "CELL_SIZE": 60,
   "MARGIN": 20,
 
   "FPS": 60,

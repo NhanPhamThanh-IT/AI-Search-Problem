@@ -1,4 +1,4 @@
 from .menu import run_menu
-from .playing import run_playing
+from .playing import PlayingScreen
 
-__all__ = ["run_menu", "run_playing"]
+__all__ = ["run_menu", "PlayingScreen"]

@@ -1,29 +1,25 @@
 from core.vehicle import Vehicle
-from typing import Dict, Tuple
+import pygame
+from config import SETTINGS
 
 class Board:
-    def __init__(self, size: Tuple[int, int], vehicles: Dict[str, Vehicle]):
-        self.rows, self.cols = size
-        self.vehicles = vehicles  # key: vehicle name, value: Vehicle object
+    def __init__(self, size, vehicles):
+        self.size = size
+        self.vehicles = {v.name: v for v in vehicles}
 
-    def is_within_bounds(self, row: int, col: int) -> bool:
-        return 0 <= row < self.rows and 0 <= col < self.cols
+    @classmethod
+    def from_dict(cls, data):
+        vehicles = [Vehicle(**v) for v in data["vehicles"]]
+        return cls(data["size"], vehicles)
 
-    def get_occupied_cells(self) -> set[tuple[int, int]]:
-        """Trả về tập hợp tất cả các ô đang bị chiếm bởi các xe."""
-        occupied = set()
+    def draw(self, screen, pos=(0, 0)):
+        cell_size = SETTINGS["CELL_SIZE"]
+        for i in range(self.size[0]):
+            for j in range(self.size[1]):
+                pygame.draw.rect(screen, (80, 80, 80), (
+                    pos[0] + j * cell_size, pos[1] + i * cell_size, cell_size, cell_size), 1)
+
         for v in self.vehicles.values():
-            occupied.update(v.get_coordinates())
-        return occupied
-
-    def display(self):
-        """In ra ma trận trò chơi dưới dạng văn bản."""
-        grid = [["." for _ in range(self.cols)] for _ in range(self.rows)]
-        for v in self.vehicles.values():
-            for r, c in v.get_coordinates():
-                grid[r][c] = v.name
-        for row in grid:
-            print(" ".join(row))
-
-    def __repr__(self):
-        return f"Board({self.rows}x{self.cols}, Vehicles={len(self.vehicles)})"
+            color = (200, 0, 0) if v.name == 'X' else (100, 100, 255)
+            rect = v.get_rect(pos, cell_size)
+            pygame.draw.rect(screen, color, rect)
