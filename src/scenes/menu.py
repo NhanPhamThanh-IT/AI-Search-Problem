@@ -9,62 +9,50 @@ def run_menu(screen, clock):
     font = pygame.font.Font(None, 36)
     title_font = pygame.font.Font(None, 42)
 
-    selected = {"map": None, "algorithm": None}
+    selected_map = None
     buttons = []
 
-    def select_item(category, value):
-        selected[category] = value
-        for b in buttons:
-            if b.group == category:
-                b.selected = (b.text == value)
+    def select_map(name):
+        nonlocal selected_map
+        selected_map = name
+        for btn in buttons:
+            btn.selected = (btn.text == name)
 
-    section_spacing = SETTINGS["WINDOW_SIZE"][1] // 5
-    section_y_positions = {
-        "map": section_spacing * 2,
-        "algorithm": section_spacing * 3.2,
-    }
+    maps = SETTINGS["MAPS"]
+    screen_width, screen_height = SETTINGS["WINDOW_SIZE"]
+    x_start = screen_width // 2 - (len(maps) * 110 - 10) // 2
+    y_buttons = screen_height // 2.5
 
-    for category, values in [("map", SETTINGS["MAPS"]), ("algorithm", SETTINGS["ALGORITHMS"])]:
-        y_button = section_y_positions[category]
-        x_start = SETTINGS["WINDOW_SIZE"][0] // 2 - (len(values) * 110 - 10) // 2
-        for i, val in enumerate(values):
-            rect = (x_start + i * 110, y_button, 100, 50)
-            btn = Button(rect, val, font, lambda c=category, v=val: select_item(c, v))
-            btn.group = category
-            buttons.append(btn)
+    for i, name in enumerate(maps):
+        rect = (x_start + i * 110, y_buttons, 100, 50)
+        button = Button(rect, name, font, lambda name=name: select_map(name))
+        buttons.append(button)
 
-    play_button = Button((SETTINGS["WINDOW_SIZE"][0] // 2 - 60, section_spacing * 4.4, 120, 60), "Play", font)
+    play_button = Button((screen_width // 2 - 60, int(screen_height * 0.75), 120, 60), "Play", font)
 
     while True:
-        mouse_pos = pygame.mouse.get_pos()
         screen.fill(SETTINGS["BG_COLOR"])
+        mouse_pos = pygame.mouse.get_pos()
 
-        for category in ["map", "algorithm"]:
-            y_label = section_y_positions[category] - 40
-            label = title_font.render(f"Select {category.title()}", True, (255, 255, 255))
-            screen.blit(label, label.get_rect(center=(SETTINGS["WINDOW_SIZE"][0] // 2, y_label)))
+        title_surf = title_font.render("Select Map", True, (255, 255, 255))
+        screen.blit(title_surf, title_surf.get_rect(center=(screen_width // 2, y_buttons - 40)))
 
-        for button in buttons:
-            button.draw(screen)
+        for btn in buttons:
+            btn.draw(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return SETTINGS["SCENES"]["QUIT"], {}
 
-            for button in buttons:
-                button.handle_event(event, mouse_pos)
+            for btn in buttons:
+                btn.handle_event(event, mouse_pos)
 
-            if play_button.rect.collidepoint(mouse_pos):
-                play_button.hover = True
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    return SETTINGS["SCENES"]["PLAY"], {
-                        "map": random_map() if selected["map"] == "Random" else selected["map"],
-                        "algorithm": selected["algorithm"]
-                    }
-            else:
-                play_button.hover = False
+            play_button.hover = play_button.rect.collidepoint(mouse_pos)
+            if play_button.hover and event.type == pygame.MOUSEBUTTONDOWN and selected_map:
+                chosen_map = random_map() if selected_map == "Random" else selected_map
+                return SETTINGS["SCENES"]["PLAY"], {"map": chosen_map}
 
-        if all(selected.values()):
+        if selected_map:
             play_button.draw(screen)
 
         pygame.display.flip()
