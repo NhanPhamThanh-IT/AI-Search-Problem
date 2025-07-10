@@ -1,0 +1,20 @@
+{
+  "TITLE": "Rush Hour Game - Introduction to AI",
+  "WINDOW_SIZE": [900, 600],
+  "BG_COLOR": [30, 30, 30],
+
+  "SCENES": {
+    "MENU": "menu",
+    "PLAY": "play",
+    "QUIT": "quit"
+  },
+
+  "MAPS": ["1", "2", "3", "4", "5", "Random"],
+  "ALGORITHMS": ["BFS", "DFS", "UCS", "A*"],
+
+  "CELL_SIZE": 80,
+  "MARGIN": 20,
+
+  "FPS": 60,
+  "TIME_LIMIT": 30
+}
