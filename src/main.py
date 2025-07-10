@@ -1,6 +1,6 @@
 import pygame
 from config import SETTINGS
-from scenes import run_menu, PlayingScreen
+from scenes import HomeScreen, PlayingScreen
 
 def run_game():
     pygame.init()
@@ -15,9 +15,10 @@ def run_game():
     running = True
     while running:
         if state == SETTINGS["SCENES"]["MENU"]:
-            state, play_data = run_menu(screen, clock)
+            home_screen = HomeScreen(screen, clock)
+            state = home_screen.run()
             if state == SETTINGS["SCENES"]["PLAY"]:
-                playing_screen = PlayingScreen(screen, clock, play_data)
+                playing_screen = PlayingScreen(screen, clock)
         elif state == SETTINGS["SCENES"]["PLAY"]:
             result = playing_screen.run()
             if result == "menu":

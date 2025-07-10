@@ -26,18 +26,23 @@ class Dropdown:
 
     def draw(self, screen):
         pygame.draw.rect(screen, (60, 60, 60), self.rect)
-        text = self.font.render(self.options[self.selected_index], True, (255, 255, 255))
-        screen.blit(text, (self.rect.x + 5, self.rect.y + 5))
         pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
+
+        selected_text = self.font.render(self.options[self.selected_index], True, (255, 255, 255))
+        text_rect = selected_text.get_rect(center=self.rect.center)
+        screen.blit(selected_text, text_rect)
 
         if self.expanded:
             for i, option in enumerate(self.options):
                 item_rect = pygame.Rect(self.rect.x, self.rect.y + (i + 1) * self.rect.height,
                                         self.rect.width, self.rect.height)
                 pygame.draw.rect(screen, (80, 80, 80), item_rect)
-                text = self.font.render(option, True, (255, 255, 255))
-                screen.blit(text, (item_rect.x + 5, item_rect.y + 5))
                 pygame.draw.rect(screen, (255, 255, 255), item_rect, 1)
+
+                option_text = self.font.render(option, True, (255, 255, 255))
+                option_text_rect = option_text.get_rect(center=item_rect.center)
+                screen.blit(option_text, option_text_rect)
+
 
     def get_selected(self):
         return self.options[self.selected_index]

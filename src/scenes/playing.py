@@ -5,29 +5,33 @@ from solvers import get_solver_class
 from config import SETTINGS
 
 class PlayingScreen:
-    def __init__(self, screen, clock, play_data):
+    def __init__(self, screen, clock):
         self.screen = screen
         self.clock = clock
         self.running = True
-
-        # Từ play_data lấy thông tin map và thuật toán
-        self.selected_map = play_data.get("map", "map1.json")
-        self.selected_algo = play_data.get("algorithm", "BFS")
 
         self.board = None
         self.solver = None
         self.stats = {}
 
         self.init_ui()
+
+        # Lấy giá trị mặc định từ dropdown để load game ban đầu
+        self.selected_map = self.map_dropdown.get_selected()
+        self.selected_algo = self.algo_dropdown.get_selected()
         self.load_game()
 
     def init_ui(self):
-        self.map_dropdown = Dropdown(100, 10, 150, 30, ["map1.json", "map2.json"])
-        self.algo_dropdown = Dropdown(300, 10, 150, 30, ["BFS", "DFS", "UCS", "A*"])
-        self.map_dropdown.set_selected(self.selected_map)
-        self.algo_dropdown.set_selected(self.selected_algo)
+        # Tạo dropdown chọn map và thuật toán
+        self.map_dropdown = Dropdown(SETTINGS["WINDOW_SIZE"][0] - 250, 10, 110, 30, ["map1.json", "map2.json"])
+        self.algo_dropdown = Dropdown(SETTINGS["WINDOW_SIZE"][0] - 100, 10, 50, 30, ["BFS", "DFS", "UCS", "A*"])
+        
+        # Đặt giá trị mặc định
+        self.map_dropdown.set_selected("map1.json")
+        self.algo_dropdown.set_selected("BFS")
 
     def load_game(self):
+        # Load dữ liệu bản đồ và thuật toán giải
         board_data = load_map_from_json(f"maps/{self.selected_map}")
         self.board = board_data
         solver_class = get_solver_class(self.selected_algo)
@@ -35,6 +39,7 @@ class PlayingScreen:
         self.stats = self.solver.solve()
 
     def run(self):
+        # Vòng lặp chính
         while self.running:
             for event in pygame.event.get():
                 result = self.handle_event(event)
@@ -50,11 +55,13 @@ class PlayingScreen:
         if event.type == pygame.QUIT:
             return "quit"
 
+        # Xử lý dropdown
         self.map_dropdown.handle_event(event)
         self.algo_dropdown.handle_event(event)
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
+                # Khi nhấn Enter: lấy lại lựa chọn từ dropdown và load lại game
                 self.selected_map = self.map_dropdown.get_selected()
                 self.selected_algo = self.algo_dropdown.get_selected()
                 self.load_game()
@@ -72,7 +79,7 @@ class PlayingScreen:
     def draw_header(self):
         font = pygame.font.Font(None, 40)
         title = font.render("Rush Hour Solver", True, (255, 255, 255))
-        self.screen.blit(title, (SETTINGS["WINDOW_SIZE"][0] // 2 - title.get_width() // 2, 10))
+        self.screen.blit(title, (50, 10))
         self.map_dropdown.draw(self.screen)
         self.algo_dropdown.draw(self.screen)
 
