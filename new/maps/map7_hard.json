@@ -1,0 +1,13 @@
+{
+    "size": [6, 6],
+    "vehicles": [
+      { "name": "A", "row": 0, "col": 2, "length": 2, "orientation": "H" },
+      { "name": "B", "row": 1, "col": 1, "length": 2, "orientation": "H" },
+      { "name": "C", "row": 1, "col": 4, "length": 2, "orientation": "H" },
+      { "name": "D", "row": 1, "col": 5, "length": 2, "orientation": "V" },
+      { "name": "E", "row": 4, "col": 0, "length": 2, "orientation": "H" },
+      { "name": "F", "row": 4, "col": 2, "length": 2, "orientation": "V" },
+      { "name": "G", "row": 4, "col": 4, "length": 2, "orientation": "H" },
+      { "name": "X", "row": 2, "col": 1, "length": 2, "orientation": "H" }
+    ]
+}
