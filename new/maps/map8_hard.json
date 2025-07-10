@@ -1,5 +1,4 @@
 {
-    "name": "Hard 2",
     "size": [6, 6],
     "vehicles": [
       { "name": "A", "row": 0, "col": 2, "length": 2, "orientation": "H" },
