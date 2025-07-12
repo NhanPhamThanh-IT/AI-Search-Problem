@@ -6,6 +6,7 @@
   "SCENES": {
     "MENU": "menu",
     "PLAY": "play",
+    "HELP": "help",
     "QUIT": "quit"
   },
 

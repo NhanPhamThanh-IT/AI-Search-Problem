@@ -20,10 +20,17 @@ class HomeScreen:
 
         button_width, button_height = 160, 60
         button_x = self.screen_width // 2 - button_width // 2
-        button_y = int(self.screen_height * 0.75)
+        play_button_y = int(self.screen_height * 0.75)
+        help_button_y = play_button_y + button_height + 20
+
         self.play_button = Button(
-            rect=pygame.Rect(button_x, button_y, button_width, button_height),
+            rect=pygame.Rect(button_x, play_button_y, button_width, button_height),
             text="Play",
+        )
+
+        self.help_button = Button(
+            rect=pygame.Rect(button_x, help_button_y, button_width, button_height),
+            text="Help",
         )
 
     def draw(self):
@@ -39,17 +46,22 @@ class HomeScreen:
             self.screen.blit(self.logo, (logo_x, logo_y))
 
         self.play_button.draw(self.screen)
+        self.help_button.draw(self.screen)
 
     def handle_events(self):
         mouse_pos = pygame.mouse.get_pos()
         self.play_button.hover = self.play_button.rect.collidepoint(mouse_pos)
+        self.help_button.hover = self.help_button.rect.collidepoint(mouse_pos)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return SETTINGS["SCENES"]["QUIT"], {}
+                return SETTINGS["SCENES"]["QUIT"]
 
-            if self.play_button.hover and event.type == pygame.MOUSEBUTTONDOWN:
-                return SETTINGS["SCENES"]["PLAY"]
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.play_button.hover:
+                    return SETTINGS["SCENES"]["PLAY"]
+                if self.help_button.hover:
+                    return SETTINGS["SCENES"]["HELP"]
 
         return None
 

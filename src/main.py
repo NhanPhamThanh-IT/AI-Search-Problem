@@ -1,6 +1,6 @@
 import pygame
 from config import SETTINGS
-from scenes import HomeScreen, PlayingScreen
+from scenes import HomeScreen, PlayingScreen, HelpScreen
 
 def run_game():
     pygame.init()
@@ -9,8 +9,8 @@ def run_game():
     clock = pygame.time.Clock()
 
     state = SETTINGS["SCENES"]["MENU"]
-    play_data = {}
     playing_screen = None
+    help_screen = None
 
     running = True
     while running:
@@ -19,12 +19,23 @@ def run_game():
             state = home_screen.run()
             if state == SETTINGS["SCENES"]["PLAY"]:
                 playing_screen = PlayingScreen(screen, clock)
+            elif state == SETTINGS["SCENES"]["HELP"]:
+                help_screen = HelpScreen(screen, clock)
+
         elif state == SETTINGS["SCENES"]["PLAY"]:
             result = playing_screen.run()
-            if result == "menu":
+            if result == SETTINGS["SCENES"]["MENU"]:
                 state = SETTINGS["SCENES"]["MENU"]
-            elif result == "quit":
+            elif result == SETTINGS["SCENES"]["QUIT"]:
                 state = SETTINGS["SCENES"]["QUIT"]
+
+        elif state == SETTINGS["SCENES"]["HELP"]:
+            result = help_screen.run()
+            if result == SETTINGS["SCENES"]["MENU"]:
+                state = SETTINGS["SCENES"]["MENU"]
+            elif result == SETTINGS["SCENES"]["QUIT"]:
+                state = SETTINGS["SCENES"]["QUIT"]
+
         elif state == SETTINGS["SCENES"]["QUIT"]:
             running = False
 
