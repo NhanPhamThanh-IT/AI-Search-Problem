@@ -30,6 +30,8 @@ def load_map_from_json(json_data: str) -> Board:
     board_size = tuple(data["size"])
     vehicles_data = data["vehicles"]
 
+    # Reset màu trước khi tạo vehicles mới
+    Vehicle.reset_colors()
     vehicles = {}
 
     for v in vehicles_data:

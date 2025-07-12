@@ -18,6 +18,8 @@ class Board:
 
     @classmethod
     def from_dict(cls, data):
+        # Reset màu trước khi tạo vehicles mới để đảm bảo màu không trùng lặp
+        Vehicle.reset_colors()
         vehicles = [Vehicle(**v) for v in data["vehicles"]]
         return cls(data["size"], vehicles)
 
@@ -46,12 +48,21 @@ class Board:
 
     def draw(self, screen, pos=(0, 0)):
         cell_size = SETTINGS["CELL_SIZE"]
+        # Tạo font cho việc hiển thị tên vehicle
+        font = pygame.font.Font(None, max(16, cell_size // 3))
+        
+        # Độ dày border của grid (có thể điều chỉnh theo ý muốn)
+        border_width = max(1, cell_size // 30)  # Tối thiểu 1px, mỏng hơn
+        
         for i in range(self.size[0]):
             for j in range(self.size[1]):
-                pygame.draw.rect(screen, (80, 80, 80), (
-                    pos[0] + j * cell_size, pos[1] + i * cell_size, cell_size, cell_size), 1)
+                pygame.draw.rect(screen, (255, 255, 255), (
+                    pos[0] + j * cell_size, pos[1] + i * cell_size, cell_size, cell_size), border_width)
 
         for v in self.vehicles.values():
-            color = (200, 0, 0) if v.name == 'X' else (100, 100, 255)
+            color = v.get_color()  # Sử dụng màu riêng của từng vehicle
             rect = v.get_rect(pos, cell_size)
             pygame.draw.rect(screen, color, rect)
+            
+            # Vẽ tên vehicle lên màn hình
+            v.draw_name(screen, pos, cell_size, font)
