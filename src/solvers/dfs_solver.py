@@ -20,7 +20,7 @@ class DFSSolver(BaseSolver):
                     "time": time.time() - start,
                     "space": len(visited),
                     "expanded": expanded,
-                    "path": path
+                    "path": path + [state]
                 }
 
             for neighbor in self.expand(state):

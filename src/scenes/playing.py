@@ -1,6 +1,6 @@
 import pygame
 from entities import Dropdown, Button
-from core.map_loader import load_map_from_json
+from core import load_map_from_json
 from solvers import get_solver_class
 from config import SETTINGS
 from utils import get_list_maps
@@ -92,14 +92,11 @@ class PlayingScreen:
             if self.solution_path:
                 self.is_solved = True
                 self.play_button.text = "Play"
-                print(f"Solution found with {len(self.solution_path)} steps")
             else:
                 self.no_solution = True
                 self.play_button.text = "No Solution"
-                print("No solution found")
                 
         except Exception as e:
-            print(f"Error solving puzzle: {e}")
             self.no_solution = True
             self.play_button.text = "Error"
             
@@ -228,14 +225,14 @@ class PlayingScreen:
         elif self.no_solution:
             labels = [
                 f"Algorithm: {algo_text}",
-                "❌ No solution found!",
+                "No solution found!",
                 "Try different algorithm",
                 "or check map validity"
             ]
         elif self.is_solved and self.stats:
             labels = [
                 f"Algorithm: {algo_text}",
-                f"✅ Time: {self.stats['time']:.2f}s",
+                f"Time: {self.stats['time']:.2f}s",
                 f"Space Used: {self.stats['space']}",
                 f"Expanded Nodes: {self.stats['expanded']}"
             ]
@@ -250,13 +247,6 @@ class PlayingScreen:
         for i, text in enumerate(labels):
             if text:
                 color = (200, 200, 200)
-                if "❌" in text:
-                    color = (255, 100, 100)
-                elif "✅" in text:
-                    color = (100, 255, 100)
-                elif "🔄" in text:
-                    color = (255, 255, 100)
-                    
                 txt = font.render(text, True, color)
                 self.screen.blit(txt, (450, 100 + i * 40))
 
@@ -283,7 +273,7 @@ class PlayingScreen:
             
             if self.current_step >= len(self.solution_path) and not self.is_playing:
                 completion_font = pygame.font.Font(None, 28)
-                completion_text = "🎉 Puzzle Solved!"
+                completion_text = "Result: Puzzle Solved!"
                 completion_txt = completion_font.render(completion_text, True, (100, 255, 100))
                 self.screen.blit(completion_txt, (450, 350))
             
