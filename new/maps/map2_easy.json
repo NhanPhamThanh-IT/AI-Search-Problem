@@ -1,8 +1,0 @@
-{
-    "size": [6, 6],
-    "vehicles": [
-      { "name": "A", "row": 0, "col": 0, "length": 2, "orientation": "H" },
-      { "name": "B", "row": 2, "col": 3, "length": 2, "orientation": "V" },
-      { "name": "X", "row": 2, "col": 1, "length": 2, "orientation": "H" }
-    ]
-}

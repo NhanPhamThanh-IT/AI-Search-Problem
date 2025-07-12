@@ -3,6 +3,7 @@ from entities import Dropdown, Button
 from core.map_loader import load_map_from_json
 from solvers import get_solver_class
 from config import SETTINGS
+from utils import get_list_maps
 
 class PlayingScreen:
     def __init__(self, screen, clock):
@@ -33,7 +34,7 @@ class PlayingScreen:
     def init_ui(self):
         self.map_dropdown = Dropdown(
             SETTINGS["WINDOW_SIZE"][0] - 250, 10, 110, 30,
-            ["map1.json", "map2.json", "map_no_solution.json"]
+            get_list_maps("maps")
         )
         self.algo_dropdown = Dropdown(
             SETTINGS["WINDOW_SIZE"][0] - 100, 10, 50, 30,
