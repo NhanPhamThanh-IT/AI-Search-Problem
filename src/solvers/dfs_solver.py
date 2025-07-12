@@ -4,8 +4,7 @@ import time
 class DFSSolver(BaseSolver):
     def solve(self):
         start = time.time()
-        stack = []
-        stack.append((self.initial_state, []))
+        stack = [(self.initial_state, [])]
         visited = set()
         expanded = 0
 
@@ -20,7 +19,8 @@ class DFSSolver(BaseSolver):
                 return {
                     "time": time.time() - start,
                     "space": len(visited),
-                    "expanded": expanded
+                    "expanded": expanded,
+                    "path": path
                 }
 
             for neighbor in self.expand(state):
@@ -30,5 +30,6 @@ class DFSSolver(BaseSolver):
         return {
             "time": time.time() - start,
             "space": len(visited),
-            "expanded": expanded
+            "expanded": expanded,
+            "path": []
         }

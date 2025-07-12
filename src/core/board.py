@@ -6,11 +6,43 @@ class Board:
     def __init__(self, size, vehicles):
         self.size = size
         self.vehicles = {v.name: v for v in vehicles}
+        self.initial_state = {}
+        for name, vehicle in self.vehicles.items():
+            self.initial_state[name] = {
+                'row': vehicle.row,
+                'col': vehicle.col,
+                'length': vehicle.length,
+                'orientation': vehicle.orientation,
+                'name': vehicle.name
+            }
 
     @classmethod
     def from_dict(cls, data):
         vehicles = [Vehicle(**v) for v in data["vehicles"]]
         return cls(data["size"], vehicles)
+
+    def reset_to_initial_state(self):
+        for name, initial_data in self.initial_state.items():
+            if name in self.vehicles:
+                vehicle = self.vehicles[name]
+                vehicle.row = initial_data['row']
+                vehicle.col = initial_data['col']
+                vehicle.length = initial_data['length']
+                vehicle.orientation = initial_data['orientation']
+                vehicle.name = initial_data['name']
+
+    def apply_move(self, state):
+        if not state:
+            return
+            
+        for vehicle_data in state:
+            row, col, length, orientation, name = vehicle_data
+            if name in self.vehicles:
+                vehicle = self.vehicles[name]
+                vehicle.row = row
+                vehicle.col = col
+                vehicle.length = length
+                vehicle.orientation = orientation
 
     def draw(self, screen, pos=(0, 0)):
         cell_size = SETTINGS["CELL_SIZE"]

@@ -22,7 +22,8 @@ class AStarSolver(BaseSolver):
                 return {
                     "time": time.time() - start,
                     "space": len(visited),
-                    "expanded": expanded
+                    "expanded": expanded,
+                    "path": path
                 }
 
             for neighbor in self.expand(state):
@@ -34,18 +35,43 @@ class AStarSolver(BaseSolver):
         return {
             "time": time.time() - start,
             "space": len(visited),
-            "expanded": expanded
+            "expanded": expanded,
+            "path": []
         }
 
     def heuristic(self, state):
-        # Ước lượng đơn giản: đếm số lượng xe chắn đường xe X
+        x_vehicle = None
         for v in state:
             if v[4] == "X":
-                x_row = v[0]
-                x_end_col = v[1] + v[2]
+                x_vehicle = v
                 break
-        count = 0
+        
+        if x_vehicle is None:
+            return 0
+            
+        x_row, x_col, x_length, x_orientation, _ = x_vehicle
+        
+        if x_orientation != 'H':
+            return float('inf')
+        
+        x_end_col = x_col + x_length
+        exit_col = self.board.size[1]
+        
+        if x_end_col >= exit_col:
+            return 0
+        
+        blocking_count = 0
         for v in state:
-            if v[0] == x_row and v[1] > x_end_col - 1:
-                count += 1
-        return count
+            if v[4] != "X":
+                v_row, v_col, v_length, v_orientation, _ = v
+                
+                if v_orientation == 'V':
+                    if (v_col > x_end_col - 1 and v_col < exit_col and 
+                        v_row <= x_row < v_row + v_length):
+                        blocking_count += 1
+                elif v_orientation == 'H':
+                    if (v_row == x_row and 
+                        v_col > x_end_col - 1 and v_col < exit_col):
+                        blocking_count += 1
+        
+        return blocking_count

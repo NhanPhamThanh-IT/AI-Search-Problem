@@ -18,7 +18,10 @@ class PlayingScreen:
         self.current_step = 0
         self.solution_path = []
         self.animation_timer = 0
-        self.animation_speed = 500  # milliseconds between steps
+        self.animation_speed = 500
+        self.is_solved = False
+        self.solving = False
+        self.no_solution = False
 
         self.init_ui()
 
@@ -30,21 +33,19 @@ class PlayingScreen:
     def init_ui(self):
         self.map_dropdown = Dropdown(
             SETTINGS["WINDOW_SIZE"][0] - 250, 10, 110, 30,
-            ["map1.json", "map2.json"]
+            ["map1.json", "map2.json", "map_no_solution.json"]
         )
         self.algo_dropdown = Dropdown(
             SETTINGS["WINDOW_SIZE"][0] - 100, 10, 50, 30,
             ["BFS", "DFS", "UCS", "A*"]
         )
 
-        # Thêm nút Play
         self.play_button = Button(
             450, 250, 80, 40, "Play", 
             bg_color=(70, 130, 180), 
             text_color=(255, 255, 255)
         )
         
-        # Thêm nút Reset
         self.reset_button = Button(
             540, 250, 80, 40, "Reset",
             bg_color=(180, 70, 70),
@@ -56,19 +57,53 @@ class PlayingScreen:
 
     def load_game(self):
         selected_map_text = self.map_dropdown.get_selected()
-        selected_algo_text = self.algo_dropdown.get_selected()
 
         board_data = load_map_from_json(f"maps/{selected_map_text}")
         self.board = board_data
-        solver_class = get_solver_class(selected_algo_text)
-        self.solver = solver_class(self.board)
-        self.stats = self.solver.solve()
         
-        # Reset animation state
+        self.solver = None
+        self.stats = {}
         self.is_playing = False
         self.current_step = 0
-        self.solution_path = self.stats.get('path', [])
+        self.solution_path = []
         self.animation_timer = 0
+        self.is_solved = False
+        self.solving = False
+        self.no_solution = False
+        self.play_button.text = "Play"
+
+    def solve_puzzle(self):
+        if not self.board or self.is_solved or self.solving:
+            return
+            
+        self.solving = True
+        self.no_solution = False
+        self.play_button.text = "Solving..."
+            
+        selected_algo_text = self.algo_dropdown.get_selected()
+        solver_class = get_solver_class(selected_algo_text)
+        self.solver = solver_class(self.board)
+        
+        try:
+            self.stats = self.solver.solve()
+            self.solution_path = self.stats.get('path', [])
+            
+            if self.solution_path:
+                self.is_solved = True
+                self.play_button.text = "Play"
+                print(f"Solution found with {len(self.solution_path)} steps")
+            else:
+                self.no_solution = True
+                self.play_button.text = "No Solution"
+                print("No solution found")
+                
+        except Exception as e:
+            print(f"Error solving puzzle: {e}")
+            self.no_solution = True
+            self.play_button.text = "Error"
+            
+        finally:
+            self.solving = False
 
     def run(self):
         while self.running:
@@ -89,7 +124,6 @@ class PlayingScreen:
                 self.prev_selected_map = current_map
                 self.prev_selected_algo = current_algo
 
-            # Update animation
             self.update_animation(dt)
 
             self.render()
@@ -102,7 +136,6 @@ class PlayingScreen:
         self.map_dropdown.handle_event(event)
         self.algo_dropdown.handle_event(event)
         
-        # Handle button clicks
         if self.play_button.handle_event(event):
             self.toggle_play()
         
@@ -112,14 +145,24 @@ class PlayingScreen:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return "menu"
-            elif event.key == pygame.K_SPACE:  # Space để toggle play
+            elif event.key == pygame.K_SPACE:
                 self.toggle_play()
-            elif event.key == pygame.K_r:  # R để reset
+            elif event.key == pygame.K_r:
                 self.reset_animation()
                 
         return None
 
     def toggle_play(self):
+        if self.solving:
+            return
+            
+        if self.no_solution:
+            return
+            
+        if not self.is_solved:
+            self.solve_puzzle()
+            return
+            
         if self.solution_path:
             self.is_playing = not self.is_playing
             self.play_button.text = "Pause" if self.is_playing else "Play"
@@ -128,26 +171,26 @@ class PlayingScreen:
         self.is_playing = False
         self.current_step = 0
         self.animation_timer = 0
+        self.is_solved = False
+        self.solving = False
+        self.no_solution = False
         self.play_button.text = "Play"
-        # Reset board to initial state
         if self.board:
             self.board.reset_to_initial_state()
-
+        
     def update_animation(self, dt):
         if self.is_playing and self.solution_path:
             self.animation_timer += dt
             
             if self.animation_timer >= self.animation_speed:
                 if self.current_step < len(self.solution_path):
-                    # Apply current step to board
                     if self.board:
                         self.board.apply_move(self.solution_path[self.current_step])
                     self.current_step += 1
                     self.animation_timer = 0
                 else:
-                    # Animation finished
                     self.is_playing = False
-                    self.play_button.text = "Play"
+                    self.play_button.text = "Replay"
 
     def render(self):
         self.screen.fill((30, 30, 30))
@@ -170,32 +213,100 @@ class PlayingScreen:
         self.draw_controls()
 
     def draw_stats(self):
-        if not self.stats:
-            return
         font = pygame.font.Font(None, 30)
         
         algo_text = self.algo_dropdown.get_selected()
 
-        labels = [
-            f"Algorithm: {algo_text}",
-            f"Time: {self.stats['time']:.2f}s",
-            f"Space Used: {self.stats['space']}",
-            f"Expanded Nodes: {self.stats['expanded']}"
-        ]
+        if self.solving:
+            labels = [
+                f"Algorithm: {algo_text}",
+                "🔄 Solving puzzle...",
+                "Please wait...",
+                ""
+            ]
+        elif self.no_solution:
+            labels = [
+                f"Algorithm: {algo_text}",
+                "❌ No solution found!",
+                "Try different algorithm",
+                "or check map validity"
+            ]
+        elif self.is_solved and self.stats:
+            labels = [
+                f"Algorithm: {algo_text}",
+                f"✅ Time: {self.stats['time']:.2f}s",
+                f"Space Used: {self.stats['space']}",
+                f"Expanded Nodes: {self.stats['expanded']}"
+            ]
+        else:
+            labels = [
+                f"Algorithm: {algo_text}",
+                "Press Play to solve",
+                "",
+                ""
+            ]
+            
         for i, text in enumerate(labels):
-            txt = font.render(text, True, (200, 200, 200))
-            self.screen.blit(txt, (450, 100 + i * 40))
+            if text:
+                color = (200, 200, 200)
+                if "❌" in text:
+                    color = (255, 100, 100)
+                elif "✅" in text:
+                    color = (100, 255, 100)
+                elif "🔄" in text:
+                    color = (255, 255, 100)
+                    
+                txt = font.render(text, True, color)
+                self.screen.blit(txt, (450, 100 + i * 40))
 
     def draw_controls(self):
-        # Draw buttons
+        if self.solving:
+            self.play_button.bg_color = (150, 150, 50)
+        elif self.no_solution:
+            self.play_button.bg_color = (180, 70, 70)
+        elif self.is_playing:
+            self.play_button.bg_color = (180, 100, 70)
+        elif self.is_solved:
+            self.play_button.bg_color = (70, 180, 70)
+        else:
+            self.play_button.bg_color = (70, 130, 180)
+        
         self.play_button.draw(self.screen)
         self.reset_button.draw(self.screen)
         
-        # Draw progress info
-        if self.solution_path:
+        if self.solution_path and not self.no_solution:
             font = pygame.font.Font(None, 24)
             progress_text = f"Step: {self.current_step}/{len(self.solution_path)}"
             txt = font.render(progress_text, True, (200, 200, 200))
+            self.screen.blit(txt, (450, 300))
+            
+            if self.current_step >= len(self.solution_path) and not self.is_playing:
+                completion_font = pygame.font.Font(None, 28)
+                completion_text = "🎉 Puzzle Solved!"
+                completion_txt = completion_font.render(completion_text, True, (100, 255, 100))
+                self.screen.blit(completion_txt, (450, 350))
+            
+            if len(self.solution_path) > 0:
+                progress = self.current_step / len(self.solution_path)
+                bar_width = 200
+                bar_height = 10
+                bar_x = 450
+                bar_y = 320
+                
+                pygame.draw.rect(self.screen, (60, 60, 60), 
+                               (bar_x, bar_y, bar_width, bar_height))
+                
+                progress_width = int(bar_width * progress)
+                color = (100, 255, 100) if progress >= 1.0 else (100, 150, 255)
+                pygame.draw.rect(self.screen, color, 
+                               (bar_x, bar_y, progress_width, bar_height))
+                
+                pygame.draw.rect(self.screen, (150, 150, 150), 
+                               (bar_x, bar_y, bar_width, bar_height), 2)
+        
+        elif self.no_solution:
+            font = pygame.font.Font(None, 24)
+            txt = font.render("No moves to display", True, (255, 100, 100))
             self.screen.blit(txt, (450, 300))
 
     def draw_footer(self):

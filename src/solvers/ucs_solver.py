@@ -5,11 +5,10 @@ import time
 class UCSSolver(BaseSolver):
     def solve(self):
         start = time.time()
-        heap = []
-        counter = 0
-        heapq.heappush(heap, (0, counter, self.initial_state, []))
+        heap = [(0, 0, self.initial_state, [])]
         visited = set()
         expanded = 0
+        counter = 0
 
         while heap:
             cost, _, state, path = heapq.heappop(heap)
@@ -22,16 +21,19 @@ class UCSSolver(BaseSolver):
                 return {
                     "time": time.time() - start,
                     "space": len(visited),
-                    "expanded": expanded
+                    "expanded": expanded,
+                    "path": path
                 }
 
             for neighbor in self.expand(state):
                 counter += 1
-                heapq.heappush(heap, (cost + 1, counter, neighbor, path + [state]))
+                new_cost = cost + 1
+                heapq.heappush(heap, (new_cost, counter, neighbor, path + [state]))
             expanded += 1
 
         return {
             "time": time.time() - start,
             "space": len(visited),
-            "expanded": expanded
+            "expanded": expanded,
+            "path": []
         }

@@ -1,18 +1,125 @@
-# Rush Hour Auto Solver
+# Rush Hour Puzzle Solver 🚗
 
-A clean, modular implementation of the Rush Hour puzzle solver with visual animation using pygame.
+Dự án cài đặt trò chơi Rush Hour và các thuật toán tìm kiếm để giải puzzle với giao diện đồ họa và console tương tác.
 
-## Code Structure
+## ✨ Tính năng mới
 
-The codebase has been organized into separate modules for better maintainability:
+### 🖼️ Giao diện đồ họa (GUI)
 
-### Core Files
+- Hiển thị bảng puzzle trực quan với màu sắc
+- Các nút tương tác cho từng thuật toán
+- Animation giải pháp theo thời gian thực
+- Thống kê hiệu suất chi tiết
+- Điều khiển tốc độ animation
 
-- **`main.py`** - Main application entry point
-- **`rushhour_logic.py`** - Core game logic and solver algorithms
-- **`display.py`** - Visual display handling with pygame
-- **`game_controller.py`** - Game animation and control logic
-- **`config.py`** - Configuration constants and settings
+### 🎮 Giao diện console tương tác
+
+- Menu hệ thống tương tác
+- Chế độ giải puzzle thủ công
+- Animation từng bước giải pháp
+- So sánh hiệu suất thuật toán
+- Gợi ý nước đi tiếp theo
+
+### 📊 Thuật toán được hỗ trợ
+
+- **BFS (Breadth-First Search)** - Tìm giải pháp tối ưu
+- **DFS (Depth-First Search)** - Tìm kiếm theo chiều sâu
+- **UCS (Uniform Cost Search)** - Tìm kiếm chi phí đồng nhất
+- **A\*** - Tìm kiếm với heuristic
+
+## 🚀 Chạy nhanh
+
+```bash
+# Cài đặt dependencies
+pip install -r requirements.txt
+
+# Chạy launcher (khuyến nghị)
+cd src
+python demo_launcher.py
+```
+
+## 📁 Cấu trúc dự án
+
+```
+src/
+├── rushhour/              # Core game logic
+│   ├── game.py           # Main game class
+│   ├── state.py          # Game state representation
+│   ├── vehicle.py        # Vehicle objects
+│   └── solver.py         # Search algorithms
+├── gui_demo_rushhour.py  # 🖼️ GUI Demo với pygame
+├── interactive_demo_rushhour.py  # 🎮 Interactive Console Demo
+├── demo_rushhour.py      # 📊 Original Console Demo
+├── demo_launcher.py      # 🚀 Main Launcher
+├── DEMO_README.md        # Chi tiết hướng dẫn demo
+└── [original files...]   # Các file gốc
+```
+
+## 🎯 Các cách chạy demo
+
+### 1. Launcher (Khuyến nghị)
+
+```bash
+cd src
+python demo_launcher.py
+```
+
+### 2. GUI Demo riêng lẻ
+
+```bash
+cd src
+python gui_demo_rushhour.py
+```
+
+### 3. Interactive Console Demo
+
+```bash
+cd src
+python interactive_demo_rushhour.py
+```
+
+### 4. Original Console Demo
+
+```bash
+cd src
+python demo_rushhour.py
+```
+
+## 🎮 Hướng dẫn sử dụng
+
+### GUI Demo
+
+- Click các nút "Solve BFS/DFS/UCS/A\*" để tìm giải pháp
+- "Animate Solution" để xem animation
+- "Speed+/-" để điều chỉnh tốc độ
+- **Phím tắt:** SPACE (animate), R (reset), ←/→ (step through)
+
+### Interactive Console
+
+- Chọn các tùy chọn từ menu
+- Chế độ solving thủ công: `move X right`, `hint`, `reset`
+- Xem so sánh hiệu suất tất cả thuật toán
+
+## 📦 Requirements
+
+- Python 3.7+
+- pygame 2.0+ (cho GUI demo)
+
+```bash
+pip install pygame
+```
+
+## 🎯 Puzzle mẫu
+
+Demo sử dụng puzzle 6x6 với:
+
+- **Vehicle X** (đỏ) - Xe cần đưa ra exit
+- **Vehicles A-G** - Các xe cản đường
+- **Mục tiêu** - Di chuyển xe X đến biên phải
+
+---
+
+## 📖 Code Structure (Original)
 
 ### Key Classes
 

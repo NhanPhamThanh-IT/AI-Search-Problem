@@ -1,12 +1,11 @@
-from collections import deque
 from solvers.base_solver import BaseSolver
+from collections import deque
 import time
 
 class BFSSolver(BaseSolver):
     def solve(self):
         start = time.time()
-        queue = deque()
-        queue.append((self.initial_state, []))
+        queue = deque([(self.initial_state, [])])
         visited = set()
         expanded = 0
 
@@ -21,7 +20,8 @@ class BFSSolver(BaseSolver):
                 return {
                     "time": time.time() - start,
                     "space": len(visited),
-                    "expanded": expanded
+                    "expanded": expanded,
+                    "path": path
                 }
 
             for neighbor in self.expand(state):
@@ -31,5 +31,6 @@ class BFSSolver(BaseSolver):
         return {
             "time": time.time() - start,
             "space": len(visited),
-            "expanded": expanded
+            "expanded": expanded,
+            "path": []
         }
