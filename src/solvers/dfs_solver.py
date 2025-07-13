@@ -7,6 +7,7 @@ class DFSSolver(BaseSolver):
         stack = [(self.initial_state, [])]
         visited = set()
         expanded = 0
+        max_space = 0
 
         while stack:
             state, path = stack.pop()
@@ -15,10 +16,12 @@ class DFSSolver(BaseSolver):
                 continue
             visited.add(key)
 
+            max_space = max(max_space, len(stack) + len(visited))
+
             if self.is_goal(state):
                 return {
                     "time": time.time() - start,
-                    "space": len(visited),
+                    "space": max_space,
                     "expanded": expanded,
                     "path": path + [state]
                 }
@@ -29,7 +32,7 @@ class DFSSolver(BaseSolver):
 
         return {
             "time": time.time() - start,
-            "space": len(visited),
+            "space": max_space,
             "expanded": expanded,
             "path": []
         }

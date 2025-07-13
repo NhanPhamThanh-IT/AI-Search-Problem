@@ -8,6 +8,7 @@ class BFSSolver(BaseSolver):
         queue = deque([(self.initial_state, [])])
         visited = set()
         expanded = 0
+        max_space = 0
 
         while queue:
             state, path = queue.popleft()
@@ -16,10 +17,12 @@ class BFSSolver(BaseSolver):
                 continue
             visited.add(key)
 
+            max_space = max(max_space, len(queue) + len(visited))
+
             if self.is_goal(state):
                 return {
                     "time": time.time() - start,
-                    "space": len(visited),
+                    "space": max_space,
                     "expanded": expanded,
                     "path": path + [state]
                 }
@@ -30,7 +33,7 @@ class BFSSolver(BaseSolver):
 
         return {
             "time": time.time() - start,
-            "space": len(visited),
+            "space": max_space,
             "expanded": expanded,
             "path": []
         }

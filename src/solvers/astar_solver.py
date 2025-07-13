@@ -21,7 +21,7 @@ class AStarSolver(BaseSolver):
             if self.is_goal(state):
                 return {
                     "time": time.time() - start,
-                    "space": len(visited),
+                    "space": len(visited) + len(heap),
                     "expanded": expanded,
                     "path": path + [state]
                 }
@@ -34,7 +34,7 @@ class AStarSolver(BaseSolver):
 
         return {
             "time": time.time() - start,
-            "space": len(visited),
+            "space": len(visited) + len(heap),
             "expanded": expanded,
             "path": []
         }
